@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¿Qué carrera eres?</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --primary-yellow: #FFD700;
+            --dark-yellow: #FFA500;
+            --light-yellow: #FFEC8B;
+            --text-color: #333;
+            --background-color: #FFF9C4;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', cursive;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 15px;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(255,237,0,0.2) 0%, transparent 70%),
+                radial-gradient(circle at 90% 80%, rgba(255,190,0,0.2) 0%, transparent 70%),
+                var(--background-color);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background-color: white;
+            border-radius: 25px;
+            box-shadow: 
+                0 15px 30px rgba(255,165,0,0.2),
+                0 10px 20px rgba(255,165,0,0.15);
+            overflow: hidden;
+            position: relative;
+            padding: 30px;
+            text-align: center;
+            border: 5px solid var(--primary-yellow);
+            transform-origin: center;
+            transition: all 0.3s ease;
+        }
+
+        .container:hover {
+            transform: rotate(1deg) scale(1.03);
+        }
+
+        h1 {
+            color: var(--dark-yellow);
+            margin-bottom: 20px;
+            font-size: 28px;
+            text-shadow: 2px 2px 4px rgba(255,165,0,0.3);
+            letter-spacing: 1px;
+        }
+
+        #quiz h2 {
+            color: var(--text-color);
+            margin-bottom: 20px;
+            font-size: 20px;
+            position: relative;
+        }
+
+        #quiz h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background-color: var(--primary-yellow);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 8px 0;
+            border: 2px solid var(--dark-yellow);
+            border-radius: 20px;
+            background-color: var(--light-yellow);
+            color: var(--text-color);
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                120deg, 
+                transparent, 
+                rgba(255,255,255,0.3), 
+                transparent
+            );
+            transition: all 0.5s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:hover {
+            background-color: var(--primary-yellow);
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255,165,0,0.3);
+        }
+
+        #startButton, #nextButton {
+            max-width: 250px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .result {
+            display: none;
+            background-color: var(--light-yellow);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 20px;
+            animation: popIn 0.5s ease-out;
+            border: 3px dashed var(--dark-yellow);
+            position: relative;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.7); opacity: 0; }
+            80% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        #result {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--text-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+        }
+
+        #result::before, #result::after {
+            content: '🎓';
+            position: absolute;
+            font-size: 30px;
+            top: -20px;
+        }
+
+        #result::before {
+            left: 0;
+            transform: rotate(-15deg);
+        }
+
+        #result::after {
+            right: 0;
+            transform: rotate(15deg);
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+                border-width: 3px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            #quiz h2 {
+                font-size: 18px;
+            }
+
+            button {
+                font-size: 14px;
+                padding: 10px 12px;
+            }
+
+            #result {
+                font-size: 20px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>¿Qué carrera eres?</h1>
+        <div id="progress" style="margin-bottom: 15px; font-size: 16px; color: var(--text-color);"></div>
+        <button id="startButton" onclick="startTest()"><b>Comenzar</b></button>
+        
+        <div id="quiz"></div>
+        <button id="nextButton" onclick="nextQuestion()" style="display:none; margin-top: 15px;"><b>Siguiente</b></button>
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "¿Qué te motiva más?", a: ["Ayudar directamente a las personas", "Transformar la educación", "Analizar la sociedad", "Equilibrar acción y análisis", "Construir políticas sociales", "Unir educación y trabajo social"] },
+            { q: "¿Dónde te ves trabajando?", a: ["Servicios sociales", "Centros educativos", "Investigación y análisis", "Organismos públicos", "Entidades sociales", "Gobierno y políticas"] },
+            { q: "¿Qué prefieres?", a: ["Intervención social", "Educación comunitaria", "Estudio de tendencias", "Diseño de políticas", "Trabajo en equipo interdisciplinario", "Acción y teoría combinadas"] },
+            { q: "¿Qué tipo de impacto quieres generar?", a: ["Mejorar la calidad de vida", "Cambiar la educación", "Comprender la sociedad", "Crear leyes y reformas", "Fomentar la justicia social", "Unir varias disciplinas"] },
+            { q: "¿Cuál de estas frases resuena más contigo?", a: ["Las personas necesitan apoyo", "La educación es clave para el cambio", "El conocimiento es poder", "Las políticas definen el rumbo", "El cambio se logra con acción", "Todo está interconectado"] },
+            { q: "Si fueras a estudiar algo adicional, sería...", a: ["Psicología", "Pedagogía", "Economía", "Ciencias Políticas", "Derecho", "Historia"] },
+            { q: "¿Qué ambiente laboral prefieres?", a: ["Interacción directa con personas", "Trabajo en comunidad", "Investigación y análisis", "Administración pública", "Trabajo de campo y planificación", "Equilibrio entre acción e investigación"] },
+            { q: "¿Cuál es tu forma de trabajar?", a: ["Empático y cercano", "Creativo y didáctico", "Crítico y reflexivo", "Estratégico y metódico", "Colaborativo y resolutivo", "Multidisciplinario"] },
+            { q: "Si pudieras cambiar algo en la sociedad, sería...", a: ["Mejorar el bienestar social", "Innovar en educación", "Cuestionar las estructuras", "Transformar las políticas", "Crear equidad social", "Combinar enfoques"] },
+            { q: "¿En qué tipo de proyectos te gustaría participar?", a: ["Intervención social", "Educación alternativa", "Investigación académica", "Diseño de políticas", "Activismo y gestión", "Proyectos multidisciplinarios"] }
+        ];
+        
+        let currentQuestion = 0;
+        const scores = { 
+            'Trabajo Social': 0, 
+            'Educación Social': 0, 
+            Sociología: 0, 
+            'Trabajo Social y Sociología': 0, 
+            'Trabajo Social y Educación Social': 0, 
+            'Sociología y Ciencias Políticas': 0 
+        };
+        
+        function startTest() {
+            document.getElementById("startButton").style.display = "none";
+            document.getElementById("nextButton").style.display = "block";
+            updateProgress();
+            showQuestion();
+        }
+        
+        function showQuestion() {
+            const quizDiv = document.getElementById("quiz");
+            quizDiv.innerHTML = `<h2>${questions[currentQuestion].q}</h2>`;
+            
+            questions[currentQuestion].a.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.onclick = () => selectAnswer(index);
+                quizDiv.appendChild(button);
+            });
+        }
+        
+        function selectAnswer(index) {
+            const keys = Object.keys(scores);
+            scores[keys[index]]++;
+            nextQuestion();
+        }
+        
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                updateProgress();
+                showQuestion();
+            } else {
+                showResult();
+            }
+        }
+        
+        function updateProgress() {
+            const progressDiv = document.getElementById("progress");
+            progressDiv.textContent = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+        }
+        
+        function showResult() {
+            document.getElementById("quiz").style.display = "none";
+            document.getElementById("nextButton").style.display = "none";
+            document.getElementById("progress").style.display = "none";
+            
+            const highest = Object.keys(scores).reduce((a, b) => 
+                scores[a] > scores[b] ? a : b
+            );
+            
+            const resultDiv = document.getElementById("result");
+            resultDiv.innerText = `¡Eres ${highest}!`;
+            resultDiv.style.display = "block";
+
+            const restartButton = document.createElement('button');
+            restartButton.textContent = "¡Volver a hacer el test!";
+            restartButton.onclick = () => location.reload();
+            resultDiv.appendChild(restartButton);
+        }
+    </script>
+</body>
+</html>
