@@ -206,7 +206,6 @@
         <button id="startButton" onclick="startTest()"><b>Comenzar</b></button>
         
         <div id="quiz"></div>
-        <button id="nextButton" onclick="nextQuestion()" style="display:none; margin-top: 15px;"><b>Siguiente</b></button>
         <div id="result" class="result"></div>
     </div>
 
@@ -236,7 +235,6 @@
         
         function startTest() {
             document.getElementById("startButton").style.display = "none";
-            document.getElementById("nextButton").style.display = "block";
             updateProgress();
             showQuestion();
         }
@@ -256,7 +254,7 @@
         function selectAnswer(index) {
             const keys = Object.keys(scores);
             scores[keys[index]]++;
-            nextQuestion();
+            nextQuestion(); // Automatically move to the next question
         }
         
         function nextQuestion() {
@@ -276,7 +274,6 @@
         
         function showResult() {
             document.getElementById("quiz").style.display = "none";
-            document.getElementById("nextButton").style.display = "none";
             document.getElementById("progress").style.display = "none";
             
             const highest = Object.keys(scores).reduce((a, b) => 
